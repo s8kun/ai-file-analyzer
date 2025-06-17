@@ -473,7 +473,8 @@ const App: React.FC = () => {
         transition={{ delay: 0.5 }}
         className="text-center p-6 text-sm text-gray-600 dark:text-gray-400 border-t dark:border-gray-700 bg-white dark:bg-gray-800"
       >
-        &copy; {new Date().getFullYear()} AI File Analyzer. Powered by Gemini.
+        &copy; {new Date().getFullYear()} AI File Analyzer. Powered by
+        Elferjnai.
       </motion.footer>
     </div>
   );
