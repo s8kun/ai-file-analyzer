@@ -1,4 +1,3 @@
-
 export type TableRow = Record<string, string>;
 
 export interface TableColumn {
@@ -8,16 +7,16 @@ export interface TableColumn {
 
 export interface ChatMessage {
   id: string;
-  sender: 'user' | 'ai';
+  sender: "user" | "ai";
   text: string;
   timestamp: Date;
 }
 
 export enum FileType {
-  PDF = 'pdf',
-  EXCEL = 'excel',
-  IMAGE = 'image',
-  UNKNOWN = 'unknown',
+  PDF = "pdf",
+  EXCEL = "excel",
+  IMAGE = "image",
+  UNKNOWN = "unknown",
 }
 
 export interface GroundingChunkWeb {
@@ -25,10 +24,12 @@ export interface GroundingChunkWeb {
   title?: string;
 }
 
-export interface RetrievedContext { // Added for clarity, matches library structure for retrievedContext
-    uri: string;
-    title: string;
+export interface RetrievedContext {
+  // Added for clarity, matches library structure for retrievedContext
+  uri?: string;
+  title: string;
 }
+
 export interface GroundingChunk {
   web?: GroundingChunkWeb;
   retrievedContext?: RetrievedContext;
@@ -42,7 +43,7 @@ export interface GroundingChunk {
 // }
 // For now, any[] is kept from original.
 export interface GroundingMetadata {
-  groundingAttributions?: any[]; 
+  groundingAttributions?: any[];
   webSearchQueries?: string[];
   groundingChunks?: GroundingChunk[];
 }

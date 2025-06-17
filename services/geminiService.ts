@@ -112,13 +112,30 @@ export const extractDataFromContent = async (
 
     if (!extractedText) {
       if (groundingMetadata && groundingMetadata.groundingChunks?.length) {
-        return { data: [], groundingMetadata }; // Return grounding info even if no table found
+        return { data: [], groundingMetadata: null }; // Return empty data and null grounding metadata
       }
       throw new Error("AI returned no text. Unable to extract data.");
     }
-
     const data = parseJsonFromGeminiResponse(extractedText);
-    return { data, groundingMetadata };
+    // Convert Gemini's GroundingMetadata to our custom type
+    const convertedGroundingMetadata: GroundingMetadata | null =
+      groundingMetadata
+        ? {
+            ...groundingMetadata,
+            groundingChunks: groundingMetadata.groundingChunks?.map(
+              (chunk) => ({
+                ...chunk,
+                retrievedContext: chunk.retrievedContext
+                  ? {
+                      ...chunk.retrievedContext,
+                      title: chunk.retrievedContext.title || "", // Ensure title is never undefined
+                    }
+                  : undefined,
+              })
+            ),
+          }
+        : null;
+    return { data, groundingMetadata: convertedGroundingMetadata };
   } catch (error) {
     console.error("Error calling Gemini API for data extraction:", error);
     const errorMessage = error instanceof Error ? error.message : String(error);

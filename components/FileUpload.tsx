@@ -12,7 +12,6 @@ export const FileUpload: React.FC<FileUploadProps> = ({
   isLoading,
 }) => {
   const [dragActive, setDragActive] = useState(false);
-  const [fileName, setFileName] = useState<string | null>(null);
 
   const acceptedTypesString = Object.keys(ACCEPTED_FILE_TYPES).join(",");
 
@@ -20,12 +19,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({
     const input = document.getElementById(
       "file-upload-input"
     ) as HTMLInputElement | null;
-    if (
-      !isLoading &&
-      fileName &&
-      (!input || !input.files || !input.files.length)
-    ) {
-      setFileName(null);
+    if (!isLoading && (!input || !input.files || !input.files.length)) {
     }
   }, [isLoading]);
 
@@ -36,7 +30,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({
           ACCEPTED_FILE_TYPES[file.type as keyof typeof ACCEPTED_FILE_TYPES]
         ) {
           onFileChange(file);
-          setFileName(file.name);
+
           setTimeout(() => {
             if (document.activeElement instanceof HTMLElement) {
               document.activeElement.blur();
@@ -49,11 +43,9 @@ export const FileUpload: React.FC<FileUploadProps> = ({
             ).join(", ")}`
           );
           onFileChange(null);
-          setFileName(null);
         }
       } else {
         onFileChange(null);
-        setFileName(null);
       }
     },
     [onFileChange]
@@ -146,34 +138,6 @@ export const FileUpload: React.FC<FileUploadProps> = ({
           disabled={isLoading}
         />
       </label>
-      {fileName && !isLoading && (
-        <div className="flex items-center space-x-3 bg-white dark:bg-gray-800 p-3 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 w-full max-w-lg">
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
-              {fileName}
-            </p>
-          </div>
-          <button
-            onClick={handleRemoveFile}
-            className="flex-shrink-0 p-1.5 rounded-full text-gray-400 hover:text-red-500 dark:text-gray-500 dark:hover:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200"
-            aria-label="Remove file"
-          >
-            <svg
-              className="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
-          </button>
-        </div>
-      )}
     </div>
   );
 };

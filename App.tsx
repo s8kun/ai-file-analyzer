@@ -296,6 +296,7 @@ const App: React.FC = () => {
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
+              className="mb-8"
             >
               <ErrorAlert message={error} onClose={() => setError(null)} />
             </motion.div>
