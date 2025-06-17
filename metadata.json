@@ -1,0 +1,5 @@
+{
+  "name": "AI File Analyzer",
+  "description": "An intelligent web application that analyzes uploaded files (PDF, Excel, Images), extracts tabular data, and allows users to chat with an AI about the file content. Powered by Gemini API.",
+  "requestFramePermissions": []
+}
