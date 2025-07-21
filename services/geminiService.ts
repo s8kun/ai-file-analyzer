@@ -2,7 +2,7 @@ import { GoogleGenAI, GenerateContentResponse, Part } from "@google/genai";
 import { TableRow, ChatMessage, FileType, GroundingMetadata } from "../types";
 import { GEMINI_TEXT_MODEL } from "../constants";
 
-const API_KEY = "AIzaSyBzpqgLsAS7qPBrdcwJMgWm2NR-dWmC1pI";
+const API_KEY = "AIzaSyBx6S4JOcPykSv8Z_gVv_0yAcSZ3jxDHOI";
 
 if (!API_KEY) {
   throw new Error(
