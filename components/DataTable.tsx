@@ -21,7 +21,7 @@ export const DataTable: React.FC<DataTableProps> = ({ data, onUpdateData }) => {
     row: number;
     col: string;
   } | null>(null);
-  const [editValue, setEditValue] = useState<string>("");
+  const [editValue, setEditValue] = useState<Record<string, any>>({});
   const [selectedRows, setSelectedRows] = useState<Set<number>>(new Set());
 
   // استخدم useMemo لتوليد cleanData فقط عند تغير data
@@ -63,13 +63,14 @@ export const DataTable: React.FC<DataTableProps> = ({ data, onUpdateData }) => {
     }
   }, [cleanData]);
 
+  // أضبط handleCellEditStart ليهيئ editValue ككائن فارغ عند بدء التعديل على خلية واحدة (للتوافق)
   const handleCellEditStart = (
     rowIndex: number,
     colKey: string,
     currentValue: string
   ) => {
     setEditingCell({ row: rowIndex, col: colKey });
-    setEditValue(currentValue);
+    setEditValue({ [colKey]: currentValue });
   };
 
   const handleCellEditSave = () => {
@@ -85,8 +86,10 @@ export const DataTable: React.FC<DataTableProps> = ({ data, onUpdateData }) => {
     }
   };
 
+  // أضبط handleCellEditCancel ليعيد editValue إلى كائن فارغ
   const handleCellEditCancel = () => {
     setEditingCell(null);
+    setEditValue({});
   };
 
   const handleRowDelete = (rowIndex: number) => {
@@ -277,20 +280,19 @@ export const DataTable: React.FC<DataTableProps> = ({ data, onUpdateData }) => {
                   <td
                     key={`${rowIndex}-${column}`}
                     className="px-2 md:px-6 py-2 md:py-4 whitespace-nowrap text-gray-900 dark:text-gray-100 text-xs md:text-sm"
-                    onClick={() =>
-                      handleCellEditStart(rowIndex, column, String(row[column]))
-                    }
                   >
-                    {editingCell?.row === rowIndex &&
-                    editingCell?.col === column ? (
+                    {editingCell?.row === rowIndex ? (
                       <input
                         type="text"
-                        value={editValue}
-                        onChange={(e) => setEditValue(e.target.value)}
-                        onBlur={handleCellEditSave}
-                        onKeyPress={handleCellEditSave}
+                        value={editValue[column] ?? row[column]}
+                        onChange={(e) => {
+                          setEditValue((prev: any) => ({
+                            ...prev,
+                            [column]: e.target.value,
+                          }));
+                        }}
                         className="w-full px-2 py-1 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white text-xs md:text-sm"
-                        autoFocus
+                        autoFocus={column === columns[0]}
                       />
                     ) : (
                       row[column]
@@ -298,15 +300,65 @@ export const DataTable: React.FC<DataTableProps> = ({ data, onUpdateData }) => {
                   </td>
                 ))}
                 <td className="px-2 md:px-4 py-2 md:py-4 text-center">
-                  <motion.button
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
-                    onClick={() => handleRowDelete(rowIndex)}
-                    className="p-1 text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 transition-colors"
-                    aria-label={`Delete row ${rowIndex + 1}`}
-                  >
-                    <TrashIcon className="w-5 h-5" />
-                  </motion.button>
+                  {editingCell?.row === rowIndex ? (
+                    <>
+                      <motion.button
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
+                        onClick={() => {
+                          const updatedData = cleanData.map((row, rIndex) => {
+                            if (rIndex === rowIndex) {
+                              return { ...row, ...editValue };
+                            }
+                            return row;
+                          });
+                          onUpdateData(updatedData);
+                          setEditingCell(null);
+                          setEditValue({});
+                        }}
+                        className="p-1 text-green-600 hover:text-green-700 dark:text-green-400 dark:hover:text-green-300 transition-colors mr-2"
+                        aria-label={`Save row ${rowIndex + 1}`}
+                      >
+                        <CheckIcon className="w-5 h-5" />
+                      </motion.button>
+                      <motion.button
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
+                        onClick={() => {
+                          setEditingCell(null);
+                          setEditValue({});
+                        }}
+                        className="p-1 text-gray-600 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 transition-colors"
+                        aria-label={`Cancel edit row ${rowIndex + 1}`}
+                      >
+                        <XMarkIcon className="w-5 h-5" />
+                      </motion.button>
+                    </>
+                  ) : (
+                    <>
+                      <motion.button
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
+                        onClick={() => {
+                          setEditingCell({ row: rowIndex, col: "" });
+                          setEditValue({ ...row });
+                        }}
+                        className="p-1 text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 transition-colors mr-2"
+                        aria-label={`Edit row ${rowIndex + 1}`}
+                      >
+                        <EditIcon className="w-5 h-5" />
+                      </motion.button>
+                      <motion.button
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
+                        onClick={() => handleRowDelete(rowIndex)}
+                        className="p-1 text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 transition-colors"
+                        aria-label={`Delete row ${rowIndex + 1}`}
+                      >
+                        <TrashIcon className="w-5 h-5" />
+                      </motion.button>
+                    </>
+                  )}
                 </td>
               </motion.tr>
             ))}
